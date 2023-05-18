@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 //HTTP Post		-	GET		-		PUT		-	DELETE
 @RestController
 @RequestMapping(path="/api/productos")
+//@CrossOrigin (origins="http://localhost:5500")
 public class ProductoController {
 	private final ProductoService productoService;	
 	

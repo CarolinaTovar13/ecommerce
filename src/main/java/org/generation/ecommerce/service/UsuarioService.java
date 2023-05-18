@@ -7,12 +7,14 @@ import org.generation.ecommerce.model.ChangePassword;
 import org.generation.ecommerce.model.Usuario;
 import org.generation.ecommerce.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UsuarioService {
 	private final UsuarioRepository usuarioRepository;
-	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	@Autowired
 	public UsuarioService (UsuarioRepository usuarioRepository) {
 		this.usuarioRepository = usuarioRepository;
@@ -43,6 +45,9 @@ public class UsuarioService {
 	public Usuario addUsuario(Usuario usuario) {
 		Usuario tmp=null;
 		if(usuarioRepository.findByEmail(usuario.getEmail()).isEmpty()) {
+			usuario.setPassword(passwordEncoder.encode(usuario.getPassword())//+salt agregar cadena para añadir un nivel de complejida
+					
+					);
 			tmp=usuarioRepository.save(usuario);
 		}//if
 		return tmp;
@@ -55,10 +60,13 @@ public class UsuarioService {
 			if((changePassword.getPassword() !=null) &&
 					(changePassword.getNewpassword() !=null) ) {
 				tmp = usuarioRepository.findById(id).get();
-				System.out.println(tmp);
-				System.out.println(changePassword);
-				if(tmp.getPassword().equals(changePassword.getPassword())) {
-					tmp.setPassword(changePassword.getNewpassword());
+				if(passwordEncoder.matches(changePassword.getPassword(), tmp.getPassword())) {
+					tmp.setPassword(passwordEncoder.encode(changePassword.getNewpassword()));
+//				}
+//				System.out.println(tmp);
+//				System.out.println(changePassword);
+//				if(tmp.getPassword().equals(changePassword.getPassword())) {
+//					tmp.setPassword(changePassword.getNewpassword());
 					usuarioRepository.save(tmp);
 					}else {
 						tmp=null;
@@ -74,7 +82,8 @@ public class UsuarioService {
 		Optional<Usuario> userByEmail = usuarioRepository.findByEmail(usuario.getEmail());
 		if(userByEmail.isPresent()) {
 			Usuario user = userByEmail.get();
-			if (user.getPassword().equals(usuario.getPassword())) {
+			if (passwordEncoder.matches(usuario.getPassword(), user.getPassword())){
+//			if (user.getPassword().equals(usuario.getPassword())) {
 				return true;
 			}//if equals
 		}//if isPresent

@@ -23,4 +23,7 @@ public class EcommerceApplication {
 			registrationBean.addUrlPatterns("/api/usuarios/*");
 			return registrationBean;
 	}//jwtFilter
+	
+	
+	
 }//class EcommerceApplcation
